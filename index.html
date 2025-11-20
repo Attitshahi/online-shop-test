@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ap Solution — Clothes, Shoes & Saree</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary1:#4f46e5; --primary2:#06b6d4; --accent:#fb7185; --muted:#6b7280; --bg:#f8fafc;
+    }
+    *{box-sizing:border-box;font-family:'Poppins',sans-serif}
+    body{margin:0;background:var(--bg);color:#111827}
+
+    /* HEADER */
+    .topbar{background:linear-gradient(90deg,var(--primary1),var(--primary2));color:white;padding:18px 22px;display:flex;align-items:center;gap:18px;}
+    .logo{font-weight:800;font-size:20px;letter-spacing:1px}
+    .searchbar{flex:1;display:flex;align-items:center;gap:8px}
+    .searchbar input{flex:1;padding:10px 12px;border-radius:10px;border:none}
+    .cart-btn{background:rgba(255,255,255,0.12);padding:10px 14px;border-radius:10px;border:none;color:white;font-weight:700;cursor:pointer}
+
+    /* NAV */
+    nav{display:flex;gap:12px;padding:12px 22px;align-items:center;background:white;box-shadow:0 3px 8px rgba(2,6,23,0.06);position:sticky;top:0;z-index:80}
+    nav a{color:#374151;text-decoration:none;font-weight:600}
+
+    /* HERO CAROUSEL */
+    .hero{margin:18px auto;width:94%;border-radius:16px;overflow:hidden;display:grid;grid-template-columns:1fr 350px;gap:18px}
+    .carousel{position:relative;height:320px;border-radius:12px;overflow:hidden}
+    .carousel img{width:100%;height:100%;object-fit:cover;display:block}
+    .hero-right{background:white;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+    .hero-title{font-size:28px;font-weight:800;margin-bottom:6px}
+    .hero-sub{color:var(--muted);margin-bottom:14px}
+    .cta{display:flex;gap:10px}
+    .btn-primary{background:linear-gradient(90deg,var(--primary1),var(--primary2));color:white;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+    .btn-outline{background:white;border:1px solid #e6edf7;padding:10px 14px;border-radius:10px;cursor:pointer}
+
+    /* FILTERS */
+    .controls{display:flex;gap:12px;align-items:center;margin:18px auto;width:94%}
+    .filters{display:flex;gap:10px;align-items:center;background:white;padding:10px;border-radius:12px;box-shadow:0 4px 14px rgba(2,6,23,0.04)}
+    select,input[type=range]{padding:8px;border-radius:8px;border:1px solid #e6edf7}
+
+    /* PRODUCTS GRID */
+    .grid{width:94%;margin:18px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+    .card{background:white;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.04);transition:transform .22s,box-shadow .22s}
+    .card:hover{transform:translateY(-8px);box-shadow:0 12px 28px rgba(2,6,23,0.08)}
+    .card img{width:100%;height:260px;object-fit:cover;border-radius:10px}
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .title{font-weight:700}
+    .price{color:var(--primary1);font-weight:800}
+    .offer-pill{background:var(--accent);color:white;padding:6px 10px;border-radius:999px;font-weight:700}
+    .actions{display:flex;gap:8px;margin-top:12px}
+    .btn{flex:1;padding:10px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn-add{background:linear-gradient(90deg,var(--primary1),var(--primary2));color:white}
+    .btn-ws{background:#25D366;color:white}
+
+    /* CART SIDEBAR */
+    .cart-sidebar{position:fixed;right:20px;bottom:20px;width:420px;max-width:95%;background:white;border-radius:14px;box-shadow:0 12px 40px rgba(2,6,23,0.14);overflow:hidden;transform:translateY(0);}
+    .cart-header{padding:12px 16px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+    .cart-items{max-height:360px;overflow:auto;padding:12px}
+    .cart-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .cart-row img{width:64px;height:64px;object-fit:cover;border-radius:8px}
+    .cart-footer{padding:12px;border-top:1px solid #f1f5f9}
+
+    /* ADMIN PANEL */
+    .admin{width:94%;margin:18px auto;background:white;padding:18px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.04)}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+    input,textarea,select{padding:10px;border-radius:10px;border:1px solid #e6edf7}
+    .admin .small{font-size:13px;color:var(--muted)}
+
+    /* FOOTER */
+    footer{margin-top:36px;padding:26px;background:#0f1724;color:white;border-top-left-radius:12px;border-top-right-radius:12px}
+
+    /* responsive */
+    @media(max-width:900px){.hero{grid-template-columns:1fr;}.carousel{height:220px}.hero-right{order:2}.topbar{flex-wrap:wrap}.searchbar{width:100%}}
+
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="logo">Ap Solution</div>
+    <div class="searchbar">
+      <input id="globalSearch" placeholder="Search products, sizes, colors..." />
+      <button class="cart-btn" id="openCart">Cart (<span id="cartCount">0</span>)</button>
+    </div>
+  </div>
+
+  <nav>
+    <a href="#" onclick="filterCategory('All')">All</a>
+    <a href="#" onclick="filterCategory('Clothes')">Clothes</a>
+    <a href="#" onclick="filterCategory('Shoes')">Shoes</a>
+    <a href="#" onclick="filterCategory('Saree')">Saree</a>
+    <a href="#offers" onclick="scrollToOffers()">Offers</a>
+    <div style="flex:1"></div>
+    <a href="#admin" onclick="showAdmin()">Admin</a>
+    <a href="#track" onclick="showTracker()">Track Order</a>
+  </nav>
+
+  <section class="hero">
+    <div class="carousel" id="carousel">
+      <!-- images will be injected -->
+    </div>
+    <div class="hero-right">
+      <div class="hero-title">Free delivery on orders above Rs. 3000</div>
+      <div class="hero-sub">New arrivals, seasonal offers and trending styles — delivered to your doorstep.</div>
+      <div class="cta">
+        <button class="btn-primary" onclick="showOffers()">See Offers</button>
+        <button class="btn-outline" onclick="filterCategory('Clothes')">Shop Clothes</button>
+      </div>
+      <div style="margin-top:14px;font-size:13px;color:var(--muted)">Tip: Click any product to view details or use "WhatsApp" to quickly order.</div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <div class="filters">
+      <label class="small">Sort:</label>
+      <select id="sortBy">
+        <option value="new">Newest</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+      </select>
+      <label class="small">Max Price:</label>
+      <input type="range" id="priceRange" min="0" max="10000" step="100" value="10000" />
+      <span id="priceVal">Rs. 10000</span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <input id="offerOnly" type="checkbox" /> <label for="offerOnly">Show discounts only</label>
+    </div>
+  </div>
+
+  <main id="productArea" class="grid">
+    <!-- product cards injected here -->
+  </main>
+
+  <!-- CART SIDEBAR (hidden by default) -->
+  <div id="cartSidebar" class="cart-sidebar" style="display:none">
+    <div class="cart-header">
+      <div style="font-weight:800">Your Cart</div>
+      <div>
+        <button onclick="closeCart()" style="background:transparent;border:none;cursor:pointer;font-weight:700">Close</button>
+      </div>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><strong>Total</strong></div>
+        <div><strong id="cartTotal">Rs. 0</strong></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="checkout()">Checkout</button>
+        <button class="btn btn-outline" onclick="clearCart()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <section id="adminPanel" class="admin" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div><h3>Admin — Add / Manage Products</h3><div class="small">Demo admin: password <strong>admin123</strong></div></div>
+      <div>
+        <button class="btn-outline" onclick="hideAdmin()">Close Admin</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div class="form-grid">
+        <input id="pName" placeholder="Product name" />
+        <select id="pCategory"><option>Clothes</option><option>Shoes</option><option>Saree</option></select>
+        <input id="pPrice" placeholder="Price (Rs.)" type="number" />
+        <input id="pOffer" placeholder="Offer text (e.g. 10% OFF)" />
+        <input id="pImage" type="file" accept="image/*" />
+      </div>
+      <textarea id="pDesc" placeholder="Short description" style="width:100%;margin-top:10px;border-radius:10px;padding:10px"></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="addProduct()">Add Product</button>
+        <button class="btn btn-outline" onclick="seedSample()">Seed Sample Products</button>
+      </div>
+    </div>
+
+    <div id="productListAdmin"></div>
+  </section>
+
+  <!-- ORDER TRACKER -->
+  <section id="tracker" class="admin" style="display:none">
+    <h3>Track Your Order</h3>
+    <div style="display:flex;gap:8px">
+      <input id="trackId" placeholder="Enter Order ID (e.g. ORD-1234)" />
+      <button class="btn btn-primary" onclick="trackOrder()">Track</button>
+    </div>
+    <div id="trackResult" style="margin-top:12px"></div>
+  </section>
+
+  <footer>
+    <div style="max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-weight:800;font-size:18px">Ap Solution</div>
+        <div style="color:#9ca3af">Clothes • Shoes • Saree — Delivering across Nepal</div>
+      </div>
+      <div>
+        <div style="font-weight:700">Contact</div>
+        <div style="color:#9ca3af">WhatsApp: +977-9861479808</div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+// ===================== Data storage helpers =====================
+const STORAGE_PRODUCTS = 'fh_products_v1'
+const STORAGE_CART = 'fh_cart_v1'
+const STORAGE_ORDERS = 'fh_orders_v1'
+
+// Initialize if empty
+function loadProducts(){
+  let p = JSON.parse(localStorage.getItem(STORAGE_PRODUCTS) || 'null')
+  if(!p){ p = []; localStorage.setItem(STORAGE_PRODUCTS, JSON.stringify(p)) }
+  return p
+}
+function saveProducts(products){ localStorage.setItem(STORAGE_PRODUCTS, JSON.stringify(products)) }
+
+function loadCart(){ return JSON.parse(localStorage.getItem(STORAGE_CART) || '[]') }
+function saveCart(cart){ localStorage.setItem(STORAGE_CART, JSON.stringify(cart)); renderCart() }
+
+function loadOrders(){ return JSON.parse(localStorage.getItem(STORAGE_ORDERS) || '[]') }
+function saveOrders(o){ localStorage.setItem(STORAGE_ORDERS, JSON.stringify(o)) }
+
+// ===================== PRODUCT RENDER =====================
+let products = loadProducts()
+let currentCategory = 'All'
+
+function renderProducts(){
+  const area = document.getElementById('productArea')
+  area.innerHTML = ''
+  const search = document.getElementById('globalSearch').value.toLowerCase()
+  const maxPrice = +document.getElementById('priceRange').value
+  const offerOnly = document.getElementById('offerOnly').checked
+  const sortBy = document.getElementById('sortBy').value
+
+  let out = products.filter(p=>{
+    if(currentCategory!=='All' && p.category!==currentCategory) return false
+    if(offerOnly && !p.offer) return false
+    if(p.price>maxPrice) return false
+    if(search && !(p.name.toLowerCase().includes(search) || (p.desc||'').toLowerCase().includes(search))) return false
+    return true
+  })
+
+  if(sortBy==='price-asc') out.sort((a,b)=>a.price-b.price)
+  else if(sortBy==='price-desc') out.sort((a,b)=>b.price-a.price)
+  else out.sort((a,b)=>b.addedAt - a.addedAt)
+
+  if(out.length===0){ area.innerHTML='<div style="grid-column:1/-1;padding:40px;background:white;border-radius:12px;text-align:center">No products found</div>'; return }
+
+  out.forEach(p=>{
+    const card = document.createElement('div'); card.className='card'
+    card.innerHTML = `
+      <img src="${p.image}" alt="${p.name}" onclick="showDetails('${p.id}')" />
+      <div class="meta">
+        <div class="title">${p.name}</div>
+        <div class="price">Rs. ${p.price}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div class="small">${p.category} • ${p.desc||''}</div>
+        ${p.offer ? '<div class="offer-pill">'+p.offer+'</div>' : ''}
+      </div>
+      <div class="actions">
+        <button class="btn btn-add" onclick="addToCart('${p.id}')">Add to Cart</button>
+        <button class="btn btn-ws" onclick="whatsappOrder('${p.id}')">WhatsApp</button>
+      </div>
+    `
+    area.appendChild(card)
+  })
+}
+
+// ===================== CAROUSEL =====================
+const carouselImgs = [
+  'https://via.placeholder.com/1400x600?text=Big+Festive+Sale+Up+to+30%25+OFF',
+  'https://via.placeholder.com/1400x600?text=New+Saree+Collection',
+  'https://via.placeholder.com/1400x600?text=Comfort+Footwear+for+Everyday'
+]
+let carouselIndex=0
+function initCarousel(){
+  const c=document.getElementById('carousel')
+  c.innerHTML=''
+  const img = document.createElement('img')
+  img.src = carouselImgs[0]
+  c.appendChild(img)
+  setInterval(()=>{
+    carouselIndex = (carouselIndex+1) % carouselImgs.length
+    img.src = carouselImgs[carouselIndex]
+  },3500)
+}
+
+// ===================== CART =====================
+function getCart(){ return loadCart() }
+function addToCart(id){
+  const p = products.find(x=>x.id===id); if(!p) return
+  const cart = getCart();
+  const found = cart.find(c=>c.id===id)
+  if(found) found.qty += 1; else cart.push({id:id, qty:1})
+  saveCart(cart)
+  alert('Added to cart')
+}
+function renderCart(){
+  const cart = getCart();
+  document.getElementById('cartCount').innerText = cart.reduce((s,i)=>s+i.qty,0)
+  const items = document.getElementById('cartItems'); items.innerHTML=''
+  let total=0
+  cart.forEach(row=>{
+    const p = products.find(x=>x.id===row.id); if(!p) return
+    const div=document.createElement('div'); div.className='cart-row'
+    div.innerHTML = `
+      <img src="${p.image}" />
+      <div style="flex:1">
+        <div style="font-weight:700">${p.name}</div>
+        <div style="color:var(--muted)">Rs. ${p.price} x ${row.qty}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:800">Rs. ${p.price*row.qty}</div>
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button onclick="changeQty('${row.id}', -1)" style="padding:6px;border-radius:6px">-</button>
+          <button onclick="changeQty('${row.id}', 1)" style="padding:6px;border-radius:6px">+</button>
+        </div>
+      </div>
+    `
+    items.appendChild(div)
+    total += p.price*row.qty
+  })
+  document.getElementById('cartTotal').innerText = 'Rs. ' + total
+}
+function changeQty(id, delta){
+  const cart = getCart();
+  const idx = cart.findIndex(c=>c.id===id); if(idx===-1) return
+  cart[idx].qty += delta
+  if(cart[idx].qty<=0) cart.splice(idx,1)
+  saveCart(cart)
+}
+function openCart(){ document.getElementById('cartSidebar').style.display='block'; renderCart() }
+function closeCart(){ document.getElementById('cartSidebar').style.display='none' }
+function clearCart(){ if(confirm('Clear cart?')){ saveCart([]) } }
+
+document.getElementById('openCart').addEventListener('click', openCart)
+
+// ===================== WHATSAPP ORDER =====================
+function whatsappOrder(id){
+  const p = products.find(x=>x.id===id); if(!p) return
+  const msg = encodeURIComponent(`Hello, I want to order *${p.name}* (Rs. ${p.price}). Please confirm availability and delivery details.`)
+  const phone = '9779861479808' // replace with your number in international format without +
+  const url = `https://wa.me/${phone}?text=${msg}`
+  window.open(url, '_blank')
+}
+
+// ===================== PRODUCT DETAILS / QUICK VIEW =====================
+function showDetails(id){
+  const p = products.find(x=>x.id===id); if(!p) return
+  const html = `Name: ${p.name}
+Price: Rs. ${p.price}
+Category: ${p.category}
+
+${p.desc||''}`
+  if(confirm(html + 'Add to cart?')) addToCart(id)
+}
+
+// ===================== CHECKOUT & ORDER =====================
+function checkout(){
+  const cart = getCart(); if(cart.length===0){ alert('Cart is empty'); return }
+  const name = prompt('Enter your name')
+  if(!name) return alert('Name required')
+  const address = prompt('Delivery address')
+  if(!address) return alert('Address required')
+  const phone = prompt('Phone number (WhatsApp preferred)')
+  if(!phone) return alert('Phone required')
+  // build order
+  const id = 'ORD-' + Math.random().toString(36).substr(2,6).toUpperCase()
+  const items = cart.map(c=>{ const p = products.find(x=>x.id===c.id); return {name:p.name,price:p.price,qty:c.qty}})
+  const total = items.reduce((s,i)=>s+i.price*i.qty,0)
+  const orders = loadOrders();
+  orders.push({id, name, address, phone, items, total, status:'Placed', date: new Date().toISOString()})
+  saveOrders(orders)
+  saveCart([])
+  closeCart()
+  alert('Order placed! Your order ID: ' + id)
+}
+
+// ===================== ADMIN LOGIC =====================
+function showAdmin(){
+  const pass = prompt('Enter admin password')
+  if(pass !== 'admin123'){ return alert('Wrong password') }
+  document.getElementById('adminPanel').style.display='block'
+  renderAdminList()
+}
+function hideAdmin(){ document.getElementById('adminPanel').style.display='none' }
+
+function addProduct(){
+  const name = document.getElementById('pName').value.trim();
+  const price = Number(document.getElementById('pPrice').value);
+  const category = document.getElementById('pCategory').value;
+  const offer = document.getElementById('pOffer').value.trim();
+  const desc = document.getElementById('pDesc').value.trim();
+  const file = document.getElementById('pImage').files[0]
+  if(!name||!price) return alert('Name and price required')
+  const id = 'P-'+Math.random().toString(36).substr(2,8).toUpperCase()
+  if(file){ const reader=new FileReader(); reader.onload = ()=>{ const img = reader.result; products.push({id,name,price,category,offer,desc,image:img,addedAt:Date.now()}); saveProducts(products); renderProducts(); renderAdminList(); alert('Product added')}; reader.readAsDataURL(file) }
+  else{ const img = 'https://via.placeholder.com/600x400?text='+encodeURIComponent(name); products.push({id,name,price,category,offer,desc,image:img,addedAt:Date.now()}); saveProducts(products); renderProducts(); renderAdminList(); alert('Product added') }
+}
+
+function renderAdminList(){
+  const div = document.getElementById('productListAdmin'); div.innerHTML=''
+  if(products.length===0) return div.innerHTML='<div class="small">No products yet.</div>'
+  products.forEach(p=>{
+    const row = document.createElement('div'); row.style.display='flex'; row.style.gap='12px'; row.style.alignItems='center'; row.style.padding='8px 0'; row.style.borderTop='1px solid #f1f5f9'
+    row.innerHTML = `<img src="${p.image}" style="width:80px;height:60px;object-fit:cover;border-radius:8px"><div style="flex:1"><strong>${p.name}</strong><div class="small">${p.category} • Rs. ${p.price} ${p.offer? ' • '+p.offer : ''}</div></div><div><button onclick="editProduct('${p.id}')" class="btn btn-outline">Edit</button><button onclick="deleteProduct('${p.id}')" class="btn btn-outline">Delete</button></div>`
+    div.appendChild(row)
+  })
+}
+
+function editProduct(id){
+  const p = products.find(x=>x.id===id); if(!p) return
+  const name = prompt('Name', p.name)
+  const price = prompt('Price', p.price)
+  const offer = prompt('Offer', p.offer||'')
+  if(!name||!price) return alert('Invalid')
+  p.name=name; p.price=Number(price); p.offer=offer; saveProducts(products); renderProducts(); renderAdminList();
+}
+function deleteProduct(id){ if(!confirm('Delete product?')) return; products = products.filter(x=>x.id!==id); saveProducts(products); renderProducts(); renderAdminList(); }
+
+// ===================== ORDER TRACKER =====================
+function showTracker(){ document.getElementById('tracker').style.display='block' }
+function trackOrder(){ const id = document.getElementById('trackId').value.trim(); const res = document.getElementById('trackResult'); const orders = loadOrders(); const o = orders.find(x=>x.id===id); if(!o) return res.innerHTML = '<div style="color:var(--muted)">Order not found</div>'; res.innerHTML = `<div><strong>Order ${o.id}</strong><div>${o.name} • ${o.phone}</div><div>Status: <strong>${o.status}</strong></div><div>Total: Rs. ${o.total}</div></div>` }
+
+// ===================== HELPERS & SEED =====================
+function seedSample(){ if(products.length>0 && !confirm('Overwrite existing products?')) return; products = [
+  {id:'P-CL1', name:'Premium Casual Shirt', price:1200, category:'Clothes', offer:'10% OFF', desc:'Breathable cotton', image:'https://via.placeholder.com/600x400?text=Casual+Shirt', addedAt:Date.now()},
+  {id:'P-CL2', name:'Winter Hoodie', price:1800, category:'Clothes', offer:'', desc:'Soft fleece', image:'https://via.placeholder.com/600x400?text=Hoodie', addedAt:Date.now()-10000},
+  {id:'P-SH1', name:'Sports Shoes', price:2500, category:'Shoes', offer:'Free Shipping', desc:'Lightweight sole', image:'https://via.placeholder.com/600x400?text=Sports+Shoes', addedAt:Date.now()-20000},
+  {id:'P-SA1', name:'Banarasi Saree', price:3500, category:'Saree', offer:'20% OFF', desc:'Traditional weave', image:'https://via.placeholder.com/600x400?text=Banarasi+Saree', addedAt:Date.now()-30000}
+]; saveProducts(products); renderProducts(); renderAdminList(); alert('Sample products added') }
+
+function filterCategory(cat){ currentCategory = cat; renderProducts() }
+function scrollToOffers(){ document.getElementById('offerOnly').checked = true; renderProducts(); window.scrollTo({top:800,behavior:'smooth'}) }
+function showOffers(){ document.getElementById('offerOnly').checked=true; renderProducts(); }
+
+// listen to controls
+document.getElementById('globalSearch').addEventListener('input', renderProducts)
+document.getElementById('priceRange').addEventListener('input', ()=>{ document.getElementById('priceVal').innerText = 'Rs. '+document.getElementById('priceRange').value; renderProducts() })
+document.getElementById('offerOnly').addEventListener('change', renderProducts)
+document.getElementById('sortBy').addEventListener('change', renderProducts)
+
+// initial
+initCarousel(); products = loadProducts(); renderProducts(); renderCart();
+
+// show admin seed hint if no products
+if(products.length===0){ setTimeout(()=>{ if(confirm('No products found. Seed sample products?')) seedSample() },400) }
+
+</script>
+</body>
+</html>
+
